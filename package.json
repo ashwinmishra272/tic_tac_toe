@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "ts-node-dev --exit-child src/index.ts",
-    "start": "ts-node src/index.ts"
+    "dev": "ts-node-dev --exit-child src/player_info.ts",
+    "start": "ts-node src/user.js"
   },
   "keywords": [],
   "author": "",
