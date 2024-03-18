@@ -14,10 +14,3 @@ class PlayerId {
         return this.playerInfo;
     }
 }
-
-// Example usage:
-const playerInfo = new PlayerInfo("example@email.com", "John Doe", "123-456-7890");
-const playerId = new PlayerId(playerInfo);
-
-console.log("Player ID:", playerId.getPlayerId());
-console.log("Player Info:", playerId.getPlayerInfo());
