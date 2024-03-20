@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "ts-node-dev --exit-child src/gameState.ts",
+    "dev": "ts-node-dev --exit-child src/index.ts",
     "start": "ts-node src/user.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^20.11.28",
+    "@types/uuid": "^9.0.8",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.2"
@@ -18,6 +20,7 @@
   "dependencies": {
     "express": "^4.18.3",
     "express-ws": "^5.0.2",
+    "uuid": "^9.0.1",
     "ws": "^8.16.0"
   }
 }
