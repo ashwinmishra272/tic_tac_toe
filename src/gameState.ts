@@ -1,20 +1,23 @@
-class GameState {
-    private static currentPlayer: string = 'X';
-    private player2Id: string;
-    private winner: string | null = null;
-    private isDraw: string | null = null;
-    static winner: any;
-    static isDraw: any;
+import PlayerRegistry from './PlayerRegistry';
 
-    constructor(player1Id: string, player2Id: string) {
-        this.player2Id = player2Id;
-    }
-    private static board: string[][] = [
+
+class GameState {
+    private currentPlayer: string = 'X';
+    private playerRegistry: PlayerRegistry;
+    private board: string[][] = [
         ['_', '_', '_'],
         ['_', '_', '_'],
         ['_', '_', '_']
     ];
-    public static makeMove(row: number, col: number): boolean {
+
+    constructor(playerRegistry: PlayerRegistry) {
+        this.playerRegistry = playerRegistry;
+    }
+
+    public makeMove(row: number, col: number, playerId: string): boolean {
+        const player = this.playerRegistry.fetch(playerId);
+        if (!player) return false; // Player not found
+
         if (this.board[row][col] === '_') {
             this.board[row][col] = this.currentPlayer;
             this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
@@ -23,53 +26,39 @@ class GameState {
         return false; // Move invalid
     }
 
-    public isGameOver(): boolean {
-        // Check for winning conditions
-        if (this.checkForWin('X')) {
-            console.log('Player X wins!');
-            return true;
-        } else if (this.checkForWin('O')) {
-            console.log('Player O wins!');
-            return true;
+    public checkForWin(): string | null {
+        for (let i = 0; i < 3; i++) {
+            if (this.board[i][0] !== '_' && this.board[i][0] === this.board[i][1] && this.board[i][1] === this.board[i][2]) {
+                return this.board[i][0]; // Row win
+            }
+        }
+
+        for (let j = 0; j < 3; j++) {
+            if (this.board[0][j] !== '_' && this.board[0][j] === this.board[1][j] && this.board[1][j] === this.board[2][j]) {
+                return this.board[0][j]; // Column win
+            }
+        }
+
+        if (this.board[0][0] !== '_' && this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2]) {
+            return this.board[0][0]; // Diagonal win (top-left to bottom-right)
+        }
+
+        if (this.board[0][2] !== '_' && this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0]) {
+            return this.board[0][2]; // Diagonal win (top-right to bottom-left)
         }
 
         // Check for draw
         if (this.isBoardFull()) {
-            console.log('It\'s a draw!');
-            return true;
+            return 'draw'; // Draw
         }
 
-        return false; // Game is not over
-    }
-
-    private checkForWin(player: string): boolean {
-        // Check rows
-        for (let i = 0; i < 3; i++) {
-            if (GameState.board[i][0] === player && GameState.board[i][1] === player && GameState.board[i][2] === player) {
-                return true;
-            }
-        }
-
-        // Check columns
-        for (let j = 0; j < 3; j++) {
-            if (GameState.board[0][j] === player && GameState.board[1][j] === player && GameState.board[2][j] === player) {
-                return true;
-            }
-        }
-
-        // Check diagonals
-        if ((GameState.board[0][0] === player && GameState.board[1][1] === player && GameState.board[2][2] === player) ||
-            (GameState.board[0][2] === player && GameState.board[1][1] === player && GameState.board[2][0] === player)) {
-            return true;
-        }
-
-        return false;
+        return null; // Game still in progress
     }
 
     private isBoardFull(): boolean {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
-                if (GameState.board[i][j] === '_') {
+                if (this.board[i][j] === '_') {
                     return false; // Found an empty cell
                 }
             }
@@ -78,17 +67,8 @@ class GameState {
     }
 
     public getBoard(): string[][] {
-        return GameState.board;
-    }
-    public static getGameStatus(): string {
-        if (this.winner) {
-            return `Player ${this.winner} wins!`;
-        } else if (this.isDraw) {
-            return 'The game is a draw.';
-        } else {
-            return 'The game is in progress.';
-        }
+        return this.board;
     }
 }
-export default GameState;
 
+export default GameState;

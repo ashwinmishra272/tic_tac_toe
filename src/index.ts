@@ -2,11 +2,13 @@ import express, { Request, Response } from 'express';
 import PlayerInfo from "./PlayerInfo"
 import PlayerRegistry from './PlayerRegistry';
 import GameRegistry from './GameRegistry';
+import GameState from './GameState';
+import Player from './player';
+import GameInitializer from './GameIntializer';
 const app = express();
 const port: number = 3000;
 const playerRegistry = new PlayerRegistry
 const gameRegistry = new GameRegistry
-
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
@@ -25,7 +27,7 @@ app.get('/api/player/:id', (req: Request, res: Response) => {
 });
 app.get('/api/game/:gameId', (req: Request, res: Response) => {
     const gameId: string = req.params.gameId;
-    const gameState = GameRegistry.getGame(gameId);
+    const gameState = gameRegistry.getGame(gameId);
     console.log(`Searching for game with ID: ${gameId}`);
 
     if (!gameState) {
@@ -38,6 +40,22 @@ app.get('/api/game/:gameId', (req: Request, res: Response) => {
     console.log(`Found game with ID: ${gameId}`);
     console.log(gameId)
     console.log(gameState)
+});
+app.post('/api/game/start', (req: Request, res: Response) => {
+    // Register players (for example)
+    const player1Id = playerRegistry.register({ email: 'player1@example.com', name: 'Player 1', phoneNumber: '123456789' });
+    const player2Id = playerRegistry.register({ email: 'player2@example.com', name: 'Player 2', phoneNumber: '987654321' });
+
+    // Create a new game and obtain the game ID
+    const gameId = GameInitializer.createGame();
+
+    // Create a new instance of GameState and pass the PlayerRegistry to it
+    const gameState = new GameState(playerRegistry);
+
+    // Register the game with the GameRegistry
+    gameRegistry.getGame(gameId);
+
+    res.json({ gameId });
 });
 
 
