@@ -1,93 +1,94 @@
 class GameState {
-    private static readonly NONE: number = 0;
-    private static readonly PLAYER_X: number = 1;
-    private static readonly PLAYER_O: number = 2;
+    private static currentPlayer: string = 'X';
+    private player2Id: string;
+    private winner: string | null = null;
+    private isDraw: string | null = null;
+    static winner: any;
+    static isDraw: any;
 
-    private board: number[][];
-    private currentPlayer: number;
-
-    constructor() {
-        this.board = this.initializeBoard();
-        this.currentPlayer = GameState.PLAYER_X;
+    constructor(player1Id: string, player2Id: string) {
+        this.player2Id = player2Id;
     }
-
-    private initializeBoard(): number[][] {
-        return Array.from({ length: 3 }, () => Array(3).fill(GameState.NONE));
-    }
-
-    makeMove(row: number, col: number): boolean {
-        if (!this.isValidMove(row, col)) {
-            return false;
+    private static board: string[][] = [
+        ['_', '_', '_'],
+        ['_', '_', '_'],
+        ['_', '_', '_']
+    ];
+    public static makeMove(row: number, col: number): boolean {
+        if (this.board[row][col] === '_') {
+            this.board[row][col] = this.currentPlayer;
+            this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            return true; // Move successful
         }
+        return false; // Move invalid
+    }
 
-        this.board[row][col] = this.currentPlayer;
-
-        if (this.hasWinner()) {
-            console.log(`Player ${this.currentPlayer === GameState.PLAYER_X ? 'X' : 'O'} wins!`);
+    public isGameOver(): boolean {
+        // Check for winning conditions
+        if (this.checkForWin('X')) {
+            console.log('Player X wins!');
+            return true;
+        } else if (this.checkForWin('O')) {
+            console.log('Player O wins!');
             return true;
         }
 
-        this.switchPlayer();
+        // Check for draw
+        if (this.isBoardFull()) {
+            console.log('It\'s a draw!');
+            return true;
+        }
 
-        return true;
+        return false; // Game is not over
     }
 
-    private isValidMove(row: number, col: number): boolean {
-        return (
-            row >= 0 &&
-            row < 3 &&
-            col >= 0 &&
-            col < 3 &&
-            this.board[row][col] === GameState.NONE
-        );
-    }
-
-    private hasWinner(): boolean {
+    private checkForWin(player: string): boolean {
+        // Check rows
         for (let i = 0; i < 3; i++) {
-            if (this.checkLine(this.board[i][0], this.board[i][1], this.board[i][2])) {
-                return true;
-            }
-            if (this.checkLine(this.board[0][i], this.board[1][i], this.board[2][i])) {
+            if (GameState.board[i][0] === player && GameState.board[i][1] === player && GameState.board[i][2] === player) {
                 return true;
             }
         }
-        if (this.checkLine(this.board[0][0], this.board[1][1], this.board[2][2])) {
-            return true;
+
+        // Check columns
+        for (let j = 0; j < 3; j++) {
+            if (GameState.board[0][j] === player && GameState.board[1][j] === player && GameState.board[2][j] === player) {
+                return true;
+            }
         }
-        if (this.checkLine(this.board[0][2], this.board[1][1], this.board[2][0])) {
+
+        // Check diagonals
+        if ((GameState.board[0][0] === player && GameState.board[1][1] === player && GameState.board[2][2] === player) ||
+            (GameState.board[0][2] === player && GameState.board[1][1] === player && GameState.board[2][0] === player)) {
             return true;
         }
 
         return false;
     }
 
-    private checkLine(a: number, b: number, c: number): boolean {
-        return a !== GameState.NONE && a === b && b === c;
+    private isBoardFull(): boolean {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (GameState.board[i][j] === '_') {
+                    return false; // Found an empty cell
+                }
+            }
+        }
+        return true; // All cells are filled
     }
 
-    private switchPlayer(): void {
-        this.currentPlayer =
-            this.currentPlayer === GameState.PLAYER_X
-                ? GameState.PLAYER_O
-                : GameState.PLAYER_X;
+    public getBoard(): string[][] {
+        return GameState.board;
     }
-
-    getCurrentPlayer(): number {
-        return this.currentPlayer;
-    }
-
-    getBoard(): number[][] {
-        return this.board;
+    public static getGameStatus(): string {
+        if (this.winner) {
+            return `Player ${this.winner} wins!`;
+        } else if (this.isDraw) {
+            return 'The game is a draw.';
+        } else {
+            return 'The game is in progress.';
+        }
     }
 }
+export default GameState;
 
-const game = new GameState();
-
-game.makeMove(0, 0);
-game.makeMove(1, 1);
-game.makeMove(0, 1);
-game.makeMove(2, 2);
-game.makeMove(0, 2);
-
-console.log("Current Player:", game.getCurrentPlayer());
-console.log("Board:", game.getBoard());
