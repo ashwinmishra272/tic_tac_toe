@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import PlayerInfo from "./PlayerInfo"
 import PlayerRegistry from './PlayerRegistry';
 import GameRegistry from './GameRegistry';
-import GameState from './GameState';
+import Game from './Game';
 import Player from './player';
 import GameInitializer from './GameIntializer';
 const app = express();
@@ -42,21 +42,19 @@ app.get('/api/game/:gameId', (req: Request, res: Response) => {
     console.log(gameState)
 });
 app.post('/api/game/start', (req: Request, res: Response) => {
-    // Register players (for example)
     const player1Id = playerRegistry.register({ email: 'player1@example.com', name: 'Player 1', phoneNumber: '123456789' });
     const player2Id = playerRegistry.register({ email: 'player2@example.com', name: 'Player 2', phoneNumber: '987654321' });
 
-    // Create a new game and obtain the game ID
     const gameId = GameInitializer.createGame();
 
-    // Create a new instance of GameState and pass the PlayerRegistry to it
-    const gameState = new GameState(playerRegistry);
+    // const gameState = new Game(playerRegistry);
 
-    // Register the game with the GameRegistry
     gameRegistry.getGame(gameId);
 
     res.json({ gameId });
 });
+
+
 
 
 app.listen(port, () => {
